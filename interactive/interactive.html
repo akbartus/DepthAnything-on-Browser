@@ -203,7 +203,7 @@
 
     async function runMyModel(src) {
 
-      const myOrtSession = await ort.InferenceSession.create("depthanything-quant.onnx");
+      const myOrtSession = await ort.InferenceSession.create("https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything-quant.onnx");
       const image = new Image();
       image.src = src;
       image.onload = async function () {
