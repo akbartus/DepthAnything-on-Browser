@@ -13,6 +13,8 @@ To use a DepthAnything example, copy the corresponding html file contents. To do
 1. Small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything_vits14.onnx
 2. Quantized model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything-quant.onnx
 
+To increase quality, increase the input image size, for example make it 1024px.
+
 
 ### **Demo**
 To see interactive DepthAnything at work, visit the following page: <a href="https://depthanything.glitch.me/">Demo</a>
