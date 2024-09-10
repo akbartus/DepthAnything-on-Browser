@@ -28,6 +28,8 @@ To dowload and locally serve models download them from the link provided:
 ```js
 gl_PointSize = 5.0; // change size here
 ```   
+### ""Tech Stack""
+The project was made possible thanks to DepthAnything repository, ONNX runtime web and Three.js.
 
 ### **Demo**
 To see interactive DepthAnything at work, visit the following page: <a href="https://depthanything.glitch.me/">Demo</a>
