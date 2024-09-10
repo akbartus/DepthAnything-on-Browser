@@ -10,9 +10,9 @@ This repository demonstrates web-based implementation of <a href="https://github
 
 ### **Instructions**
 To use a DepthAnything example, copy the corresponding html file contents. To dowload and locally serve models download them from the link provided:
-1. Original model:
-2. Quantized model: 
+1. Small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything_vits14.onnx
+2. Quantized model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything-quant.onnx
 
 
 ### **Demo**
-To see interactive DepthAnything at work, visit the following page: 
+To see interactive DepthAnything at work, visit the following page: <a href="https://depthanything.glitch.me/">Demo</a>
