@@ -7,7 +7,7 @@
 This repository demonstrates web-based implementation of <a href="https://github.com/LiheYoung/Depth-Anything">Depth Anything: Unleashing the Power of Large-Scale Unlabeled Data. Foundation Model for Monocular Depth Estimation</a> and more capable <a href="https://github.com/DepthAnything/Depth-Anything-V2">Depth Anything V2</a>. This project demonstrates the following:
 1. Basic DepthAnything, which shows only generated depth ("basic" folder)
 2. Interactive DepthAnything, which shows 3D model based on generated depth and Three.js ("interactive" folder).
-3. Interactive DepthAnything v2 which shows 3D model based on generated depth and Three.js ("interactive_v2" folder).
+3. Interactive DepthAnything v2 which shows 3D model based on generated depth and Three.js ("interactive-v2" folder).
 
 ### **Instructions**
 To use a DepthAnything example, copy the corresponding html file contents. Onnx original models were taken and adapted from <a href="https://github.com/fabio-sim/Depth-Anything-ONNX/releases/tag/v2.0.0">Fabio Milentiansen Sim's Depth Anything ONNX repository.</a> 
