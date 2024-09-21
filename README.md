@@ -13,11 +13,11 @@ This repository demonstrates web-based implementation of <a href="https://github
 To use a DepthAnything example, copy the corresponding html file contents. Onnx original models were taken and adapted from <a href="https://github.com/fabio-sim/Depth-Anything-ONNX/releases/tag/v2.0.0">Fabio Milentiansen Sim's Depth Anything ONNX repository.</a> 
 
 To dowload and locally serve models download them from the link provided:
-1. Depth Anything small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything_vits14.onnx
-2. Depth Anything quantized model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything-quant.onnx
-3. Depth Anything v2 dynamic quantized small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits-dynamic-quant.onnx
-4. Depth Anything v2 dynamic small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits-dynamic.onnx
-5. Depth Anything v2 small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits.onnx 
+1. Depth Anything small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything_vits14.onnx (~97 mb)
+2. Depth Anything quantized model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything-quant.onnx (~26 mb)
+3. Depth Anything v2 dynamic quantized small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits-dynamic-quant.onnx (~26 mb)
+4. Depth Anything v2 dynamic small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits-dynamic.onnx (~97 mb)
+5. Depth Anything v2 small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits.onnx (~97 mb)
 
 <b>Please note:</b>
 1. To increase quality, increase the input image size, for example make it 1024px.
