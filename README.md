@@ -10,7 +10,7 @@ This repository demonstrates web-based implementation of <a href="https://github
 3. Interactive DepthAnything v2 which shows 3D model based on generated depth and Three.js ("interactive-v2" folder).
 
 ### **Instructions**
-To use a DepthAnything example, copy the corresponding html file contents. Onnx original models were taken and adapted from <a href="https://github.com/fabio-sim/Depth-Anything-ONNX/releases/tag/v2.0.0">Fabio Milentiansen Sim's Depth Anything ONNX repository.</a> 
+To use a DepthAnything example, copy the corresponding html file contents. Onnx original models were taken and adapted from <a href="https://github.com/fabio-sim/Depth-Anything-ONNX/releases/tag/v2.0.0">Fabio Milentiansen Sim's Depth Anything ONNX repository.</a> Quantization was done using Onnx's quantization functionality.
 
 To dowload and locally serve models download them from the link provided:
 1. Depth Anything small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanything_vits14.onnx (~97 mb)
