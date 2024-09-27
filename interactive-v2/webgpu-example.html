@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DepthAnythingV2 on Browser: Interactive Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.webgpu.min.js"></script>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    #txt {
+      text-align: center;
+      display: block;
+    }
+
+    .container {
+      position: relative;
+      height: 50px;
+      width: 100vw;
+    }
+
+    #file {
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      /* Optional: Add styling to the file input if needed */
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      color: white;
+    }
+
+    .loadingSpinner {
+      border: 8px solid rgba(96, 96, 96, 0.5);
+      border-radius: 50%;
+      border-top: 8px solid #ffffff;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    .loadingText {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    canvas {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="txt">Upload any image to get its depth. <br> Current size: 518px x 518px</div>
+    <input type="file" id="file" />
+  </div>
+  <div id="loadingOverlay">
+    <div class="loadingSpinner"></div>
+    <div class="loadingText" id="loadingText">Processing...</div>
+  </div>
+
+
+
+  <script>
+    // Overlay with loader 
+    const showLoading = () => {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+    };
+    const hideLoading = () => {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    };
+
+
+    // Depth Anything preprocess
+    const preprocess = (input_imageData, width, height) => {
+      var floatArr = new Float32Array(width * height * 3);
+      var floatArr1 = new Float32Array(width * height * 3);
+      var floatArr2 = new Float32Array(width * height * 3);
+
+      var j = 0;
+      for (let i = 1; i < input_imageData.data.length + 1; i++) {
+        if (i % 4 != 0) {
+          floatArr[j] = input_imageData.data[i - 1] / 255; // red color
+          j = j + 1;
+        }
+      }
+      for (let i = 1; i < floatArr.length + 1; i += 3) {
+        floatArr1[i - 1] = floatArr[i - 1]; // red   color
+        floatArr1[i] = floatArr[i]; // green color
+        floatArr1[i + 1] = floatArr[i + 1]; // blue  color
+
+      }
+      var k = 0;
+      for (let i = 0; i < floatArr.length; i += 3) {
+        floatArr2[k] = floatArr[i]; // red color
+        k = k + 1;
+      }
+      var l = k;
+      for (let i = 1; i < floatArr.length; i += 3) {
+        floatArr2[l] = floatArr[i]; // green color
+        l = l + 1;
+      }
+
+      var m = l;
+      for (let i = 2; i < floatArr.length; i += 3) {
+        floatArr2[m] = floatArr[i]; // blue color
+        m = m + 1;
+      }
+      return floatArr2;
+    };
+
+    const postprocess = (tensor) => {
+      const channels = tensor.dims[0];
+      const height = tensor.dims[1];
+      const width = tensor.dims[2];
+
+      const imageData = new ImageData(width, height);
+      const data = imageData.data;
+
+      const tensorData = new Float32Array(tensor.data.buffer);
+      let max_depth = 0;
+      let min_depth = Infinity;
+
+      // Find the min and max depth values
+      for (let h = 0; h < height; h++) {
+        for (let w = 0; w < width; w++) {
+          const tensorIndex = (0 * height + h) * width + w; // Only one channel is used
+          const value = tensorData[tensorIndex];
+          if (value > max_depth) max_depth = value;
+          if (value < min_depth) min_depth = value;
+        }
+      }
+
+      // Normalize and fill ImageData
+      for (let h = 0; h < height; h++) {
+        for (let w = 0; w < width; w++) {
+          const tensorIndex = (0 * height + h) * width + w; // Only one channel is used
+          const value = tensorData[tensorIndex];
+          const depth = ((value - min_depth) / (max_depth - min_depth)) * 255;
+
+          // Set grayscale value
+          data[(h * width + w) * 4] = Math.round(depth);    // Red channel
+          data[(h * width + w) * 4 + 1] = Math.round(depth); // Green channel
+          data[(h * width + w) * 4 + 2] = Math.round(depth); // Blue channel
+          data[(h * width + w) * 4 + 3] = 255;               // Alpha channel
+        }
+      }
+
+      return imageData;
+    };
+
+    const uploadfile = () => {
+      const fileInput = document.getElementById("file");
+      fileInput.addEventListener("change", function () {
+        showLoading(); // Show overlay
+        const file = this.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+
+          runMyModel(this.result);
+        };
+      });
+    };
+
+    async function runMyModel(src) {
+      const options = {
+        executionProviders: ['webgpu'],
+        logSeverityLevel: 3
+      }
+      const myOrtSession = await ort.InferenceSession.create("https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits-dynamic-quant.onnx", options);
+      const image = new Image();
+      image.src = src;
+      image.onload = async function () {
+        const size = 518; // change input size as needed
+        let canvas = document.createElement("canvas");
+        canvas.id = "originalImage";
+        canvas.width = size;
+        canvas.height = size;
+        let ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0, size, size);
+        document.body.appendChild(canvas);
+        const input_img = ctx.getImageData(0, 0, size, size);
+
+        const test = preprocess(input_img, size, size);
+        const input = new ort.Tensor(new Float32Array(test), [1, 3, size, size]);
+        const downsample_ratio = new ort.Tensor(new Float32Array([1]));
+        const result = await myOrtSession.run({ image: input });
+        console.log(result);
+        const output = result.depth; // Ensure this is the correct key
+        const imgdata = postprocess(output);
+        canvas = document.createElement("canvas");
+        canvas.id = "depth"
+
+        ctx = canvas.getContext("2d");
+        canvas.width = output.dims[2];
+        canvas.height = output.dims[1];
+        ctx.putImageData(imgdata, 0, 0);
+        document.body.appendChild(canvas);
+
+        main();
+      };
+
+    }
+
+    uploadfile();
+
+    // Three.js
+    // Load image function
+    async function loadImage(element) {
+      return new Promise((resolve, reject) => {
+        let img = new Image();
+        if (element instanceof HTMLCanvasElement) {
+          img.src = element.toDataURL(); // Convert canvas to data URL
+        } else if (element instanceof HTMLImageElement) {
+          img.src = element.src; // Get the src of the image
+        } else {
+          reject(new Error('Unsupported element type'));
+          return;
+        }
+
+        img.onload = () => resolve(img);
+        img.onerror = (error) => reject(error);
+      });
+    }
+
+
+    function getImageData(img) {
+      const ctx = document.createElement("canvas").getContext("2d");
+      ctx.canvas.width = img.width;
+      ctx.canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      return ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
+
+    // return the pixel at UV coordinates (0 to 1) in 0 to 1 values
+    function getPixel(imageData, u, v) {
+      const x = u * (imageData.width - 1) | 0;
+      const y = v * (imageData.height - 1) | 0;
+      if (x < 0 || x >= imageData.width || y < 0 || y >= imageData.height) {
+        return [0, 0, 0, 0];
+      } else {
+        const offset = (y * imageData.width + x) * 4;
+        return Array.from(imageData.data.slice(offset, offset + 4)).map(v => v / 255);
+      }
+    }
+
+    async function main() {
+      const images = await Promise.all([
+        loadImage(document.querySelector("#originalImage")),  // RGB image
+        loadImage(document.querySelector("#depth")),  // Depth image
+      ]);
+      const data = images.map(getImageData);
+
+      // Create a new canvas for THREE.js
+      const canvas = document.createElement('canvas');
+      canvas.style.width = '518px'; // Set the size as needed
+      canvas.style.height = '518px';
+      document.body.appendChild(canvas);
+
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+
+      const fov = 45;
+      const aspect = 2;  // the canvas default
+      const near = 0.001;
+      const far = 100;
+      const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+      camera.position.z = 2;
+
+      const controls = new THREE.OrbitControls(camera, canvas);
+      controls.target.set(0, 0, 0);
+      controls.update();
+
+      const scene = new THREE.Scene();
+
+      const rgbData = data[0];
+      const depthData = data[1];
+
+      const skip = 1; // change here
+      const across = Math.ceil(rgbData.width / skip);
+      const down = Math.ceil(rgbData.height / skip);
+
+      const positions = [];
+      const colors = [];
+      const greenPositions = []; // array to store positions of green pixels
+      const color = new THREE.Color();
+      const spread = 1;
+      const depthSpread = -1; // invert if necessary
+      const imageAspect = rgbData.width / rgbData.height;
+
+      const greenXPositions = []; // array to store x-positions of green pixels
+      const greenYPositions = [];
+      for (let y = 0; y < down; ++y) {
+        const v = y / (down - 1);
+        for (let x = 0; x < across; ++x) {
+          const u = x / (across - 1);
+          const rgb = getPixel(rgbData, u, v);
+          const depth = 1 - getPixel(depthData, u, v)[0];
+
+          positions.push(
+            (u * 2 - 1) * spread * imageAspect,
+            (v * -2 + 1) * spread,
+            depth * depthSpread,
+          );
+          colors.push(...rgb.slice(0, 3));
+
+          // check if the pixel is green and if so, store its position
+          if (rgb[0] === 0 && rgb[1] === 1 && rgb[2] === 0) {
+            const xPos = (u * 2 - 1) * spread * imageAspect;
+            const yPos = (v * -2 + 1) * spread;
+            const zPos = depth * depthSpread;
+
+            greenPositions.push({ x: xPos, y: yPos, z: zPos }); // store the entire position as an object
+            greenXPositions.push(xPos); // store the x-position
+            greenYPositions.push(yPos); // store the y-position
+          }
+        }
+      }
+
+      greenXPositions.sort((a, b) => a - b);
+      greenYPositions.sort((a, b) => a - b);
+
+      let lastBigJumpPosition = greenXPositions[0]; // Initialize with the first position
+      // Find the differences
+      for (let i = 1; i < greenXPositions.length; i++) {
+        let difference = Math.abs(lastBigJumpPosition - greenXPositions[i]);
+        if (difference > 0.05) {
+          console.log('From X position:', lastBigJumpPosition, 'to the next X position: ', greenXPositions[i]);
+          lastBigJumpPosition = greenXPositions[i]; // Update the last big jump position
+        }
+      }
+
+      let lastBigJumpYPosition = greenYPositions[0]; // Initialize with the first position
+
+      // Find the differences
+      for (let i = 1; i < greenYPositions.length; i++) {
+        let difference = Math.abs(lastBigJumpYPosition - greenYPositions[i]);
+        if (difference > 0.05) {
+          console.log('Large jump from Y position:', lastBigJumpYPosition, 'to current Y position:', greenYPositions[i]);
+          lastBigJumpYPosition = greenYPositions[i]; // Update the last big jump position
+        }
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      const vertexShader = `
+        attribute vec3 color;
+        varying vec3 vColor;
+
+        void main() {
+            vColor = color;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = 3.0;
+        }
+    `;
+
+      const fragmentShader = `
+        varying vec3 vColor;
+
+        void main() {
+            gl_FragColor = vec4(vColor, 1.0);
+        }
+    `;
+
+      const material = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+      });
+
+      const points = new THREE.Points(geometry, material);
+
+      scene.add(points);
+      hideLoading(); // Hide overlay
+      function resizeRendererToDisplaySize(renderer) {
+        const canvas = renderer.domElement;
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        const needResize = canvas.width !== width || canvas.height !== height;
+        if (needResize) {
+          renderer.setSize(width, height, false);
+        }
+        return needResize;
+      }
+
+      function render(time) {
+        time *= 0.001;
+
+        if (resizeRendererToDisplaySize(renderer)) {
+          const canvas = renderer.domElement;
+          camera.aspect = canvas.clientWidth / canvas.clientHeight;
+          camera.updateProjectionMatrix();
+        }
+
+        renderer.render(scene, camera);
+
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+
+
+  </script>
+</body>
+
+</html>
