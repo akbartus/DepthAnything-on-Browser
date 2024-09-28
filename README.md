@@ -32,9 +32,11 @@ To dowload and locally serve models download them from the link provided:
 3. To increase point cloud point size:
 ```js
 gl_PointSize = 5.0; // change size here
-```   
+```
+Webgpu version works on the browsers and devices supporting it (see: https://github.com/gpuweb/gpuweb/wiki/Implementation-Status). 
+
 ### **Tech Stack**
 The project was made possible thanks to DepthAnything and DepthAnythingV2, Fabio Milentiansen Sim's Depth Anything ONNX repositories, ONNX runtime web and Three.js.
 
 ### **Demo**
-To see interactive DepthAnything at work, visit the following page: <a href="https://depthanything.glitch.me/">Demo</a>, <a href="https://depthanything.glitch.me/interactive-dynamic.html">Demo v2</a>
+To see interactive DepthAnything at work, visit the following page: <a href="https://depthanything.glitch.me/">DepthAnything v1 demo</a>, <a href="https://depthanything.glitch.me/interactive-dynamic.html">DepthAnything v2 demo</a>, <a href="https://depthanything.glitch.me/webgpu-example.html">DepthAnything v2 webgpu (fastest) demo</a>
