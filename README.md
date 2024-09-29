@@ -39,4 +39,4 @@ Webgpu version works on the browsers and devices supporting it (see: https://git
 The project was made possible thanks to DepthAnything and DepthAnythingV2, Fabio Milentiansen Sim's Depth Anything ONNX repositories, ONNX runtime web and Three.js.
 
 ### **Demo**
-To see DepthAnything v1 and 2 at work, visit the following pages: <a href="https://depthanything.glitch.me/">DepthAnything v1 demo</a>, <a href="https://depthanything.glitch.me/interactive-dynamic.html">DepthAnything v2 demo</a>, <a href="https://depthanything.glitch.me/webgpu-example.html">DepthAnything v2 webgpu (fastest) demo</a>, <a href="https://depthanything.glitch.me/webgpu-sliders.html">DepthAnything v2 with Sliders demo</a>.
+To see DepthAnything v1 and 2 at work, visit the following pages: <a href="https://depthanything.glitch.me/">DepthAnything v1 demo</a>, <a href="https://depthanything.glitch.me/interactive-dynamic.html">DepthAnything v2 demo</a>, <a href="https://depthanything.glitch.me/webgpu-example.html">DepthAnything v2 webgpu (fastest) demo</a>, <a href="https://depthanything.glitch.me/webgpu-sliders.html">DepthAnything v2 webgpu with Sliders demo</a>.
