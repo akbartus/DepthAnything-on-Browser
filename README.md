@@ -19,7 +19,7 @@ To dowload and locally serve models download them from the link provided:
 3. Depth Anything v2 dynamic quantized small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits-dynamic-quant.onnx (~26 mb)
 4. Depth Anything v2 dynamic small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits-dynamic.onnx (~97 mb)
 5. Depth Anything v2 small model: https://cdn.glitch.me/0f5359e2-6022-421b-88f7-13e276d0fb33/depthanythingv2-vits.onnx (~97 mb)
-6. Depth Anything v2 small model with 4 bit quantization: https://cdn.glitch.global/0f5359e2-6022-421b-88f7-13e276d0fb33/model_q4f16.onnx (taken from ONNX community on HuggingFace, https://huggingface.co/onnx-community/depth-anything-v2-small/tree/main/onnx) 
+6. Depth Anything v2 small model with 4 bit quantization: https://cdn.glitch.global/0f5359e2-6022-421b-88f7-13e276d0fb33/model_q4f16.onnx (~18mb) (taken from ONNX community on HuggingFace, https://huggingface.co/onnx-community/depth-anything-v2-small/tree/main/onnx) 
 
 <b>Please note:</b>
 1. To increase quality, increase the input image size, for example make it 1024px.
